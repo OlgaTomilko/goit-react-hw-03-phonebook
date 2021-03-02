@@ -91,54 +91,67 @@ class Phonebook extends Component {
     filter: "",
   };
 
+  componentDidMount() {
+    const contacts = localStorage.getItem("contacts");
+    const parsedContacts = JSON.parse(contacts);
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
+
   handleInputChange = (event) => {
     const option = event.target.id;
-    this.setState((prevState) => ({ [option]: event.target.value }));
+    this.setState(() => ({ [option]: event.target.value }));
   };
 
   handleButtonClick = (event) => {
+    const { name, number, contacts } = this.state;
     event.preventDefault();
     this.isAlreadyContact()
-      ? alert(`${this.state.name} is already in contacts.`)
-      : this.setState((prevState) => ({
-          contacts: [
-            ...this.state.contacts,
-            { id: uuidv4(), name: this.state.name, number: this.state.number },
-          ],
+      ? alert(`${name} is already in contacts.`)
+      : this.setState(() => ({
+          contacts: [...contacts, { id: uuidv4(), name: name, number: number }],
         }));
   };
 
   handleInputFind = (event) => {
-    this.setState((prevState) => ({
+    this.setState(() => ({
       filter: event.target.value,
     }));
   };
 
   filterContactsList = () => {
-    const filterContacts = this.state.contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
+    const { contacts, filter } = this.state;
+    const filterContacts = contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
     );
     return filterContacts;
   };
 
   isAlreadyContact = () => {
-    const Names = this.state.contacts.map((contact) => contact.name);
+    const { contacts } = this.state;
+    const Names = contacts.map((contact) => contact.name);
     const isAlreadyContact = Names.includes(this.state.name);
     return isAlreadyContact;
   };
 
-  index = (value) => {
-    const ids = this.state.contacts.map((contact) => contact.id);
-    const index = ids.indexOf(value);
-    return index;
-  };
-
   handleButtonDelete = (event) => {
-    this.state.contacts.splice(this.index(event.target.id), 1);
-    this.setState((prevState) => ({ ...prevState }));
+    const { contacts } = this.state;
+    const filterContacts = contacts.filter(
+      (contact) => contact.id !== event.currentTarget.id
+    );
+
+    this.setState(() => ({ contacts: filterContacts }));
   };
 
   render() {
+    const { contacts, filter } = this.state;
     return (
       <div>
         <h1>Phonebook</h1>
@@ -149,8 +162,8 @@ class Phonebook extends Component {
         <h2>Contacts</h2>
         <Filter onInputFind={this.handleInputFind} />
         <ContactList
-          filter={this.state.filter}
-          contacts={this.state.contacts}
+          filter={filter}
+          contacts={contacts}
           onFilterContacts={this.filterContactsList}
           onDelete={this.handleButtonDelete}
         />
