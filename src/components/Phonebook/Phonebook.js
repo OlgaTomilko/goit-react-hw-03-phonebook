@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import ContactForm from "../ContactForm/ContactForm";
 import Filter from "../Filter/Filter";
 import ContactList from "../ContactList/ContactList";
+import Modal from "../Modal/Modal";
+import Button from "@material-ui/core/Button";
 
 // ========== HOOK =============
 
@@ -89,6 +91,7 @@ class Phonebook extends Component {
   state = {
     contacts: [],
     filter: "",
+    showModal: false,
   };
 
   componentDidMount() {
@@ -146,14 +149,32 @@ class Phonebook extends Component {
     const filterContacts = contacts.filter(
       (contact) => contact.id !== event.currentTarget.id
     );
-
     this.setState(() => ({ contacts: filterContacts }));
+    this.toggleModal();
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
   render() {
-    const { contacts, filter } = this.state;
+    const { contacts, filter, showModal } = this.state;
     return (
       <div>
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <h1>Контакт удален</h1>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              type="button"
+              onClick={this.toggleModal}
+            >
+              Закрыть
+            </Button>
+          </Modal>
+        )}
         <h1>Phonebook</h1>
         <ContactForm
           onInputChange={this.handleInputChange}

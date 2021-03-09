@@ -25,6 +25,7 @@ const ContactForm = ({ onInputChange, onButtonClick }) => {
         variant="contained"
         color="primary"
         size="small"
+        type="button"
         onClick={onButtonClick}
       >
         Add contact
