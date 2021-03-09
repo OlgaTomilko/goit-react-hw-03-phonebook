@@ -13,6 +13,7 @@ const Phonebook = () => {
   const [items, setItems] = useState({
     contacts: [],
     filter: "",
+    showModal: false,
   });
 
   //componentDidMount
@@ -22,6 +23,9 @@ const Phonebook = () => {
     if (parsedContacts) {
       setItems((prevState) => ({ ...prevState, contacts: parsedContacts }));
     }
+
+    //componentWillUnMount
+    // return ()=>{};
   }, []);
 
   //   componentDidUpdate, after every render
@@ -78,10 +82,32 @@ const Phonebook = () => {
       (contact) => contact.id !== event.currentTarget.id
     );
     setItems((prevState) => ({ ...prevState, contacts: filterContacts }));
+    toggleModal();
+  };
+
+  const toggleModal = () => {
+    setItems((prevState) => ({
+      ...prevState,
+      showModal: !items.showModal,
+    }));
   };
 
   return (
     <div>
+      {items.showModal && (
+        <Modal onClose={toggleModal}>
+          <h1>Контакт удален</h1>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            type="button"
+            onClick={toggleModal}
+          >
+            Закрыть
+          </Button>
+        </Modal>
+      )}
       <h1>Phonebook</h1>
       <ContactForm
         onInputChange={handleInputChange}
